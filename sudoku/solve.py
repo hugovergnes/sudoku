@@ -1,10 +1,11 @@
-def naive_solve(table):
-    changed = naive_update(table)
+def solve(table):
+    changed = update(table)
     while changed:
-        changed = naive_update(table)
+        print('chnaged')
+        changed = update(table)
     
 
-def naive_update(table):
+def update(table):
     changed = False
     for row in range(9):
         for col in range(9):
