@@ -1,8 +1,0 @@
-pyenv versions
-pyenv local sudokuenv (In this folder)
-
-#from /Users/hugovergnes/Documents/sudoku, the thing below works
-PYTHONPATH=../ python3 -m pytest test/test_table.py
-
-
-https://github.com/posquit0/Awesome-CV
