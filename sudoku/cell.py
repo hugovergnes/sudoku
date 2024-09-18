@@ -31,7 +31,7 @@ class Cell:
 
     def set_value(self, value):
         self.value = value
-        self.candidate_values = None
+        self.candidate_values = set()
 
     def get_candidate_values(self):
         return self.candidate_values
