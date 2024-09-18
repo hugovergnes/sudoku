@@ -7,61 +7,59 @@ def solve(table):
     while changed:
         changed = update(table)
 
-    # Then do some solving. Check if the value can be in own place in the row, col and block
+    # Then, check if the value can be in only one place in
+    # the row, col and block.
     if not table.is_solved():
         changed = True
         while changed:
             changed = False
-            changed = changed or fill_unique_value_row(table)
-            changed = changed or fill_unique_value_column(table)
-            changed = changed or fill_unique_value_block(table)
+            changed |= fill_unique_value(table, "row")
+            changed |= fill_unique_value(table, "column")
+            changed |= fill_unique_value(table, "block")
+
+    return table.is_solved()
 
 
-def fill_unique_value_block(table):
+def fill_unique_value(table, unit_type):
+    """
+    Fill unique values in rows, columns, or blocks based on unit_type.
+
+    Args:
+        table: The Sudoku table.
+        unit_type (str): One of 'row', 'column', or 'block'.
+
+    Returns:
+        bool: True if any changes were made, False otherwise.
+    """
     changed = False
-    for row_block_idx in range(3):
-        for col_block_idx in range(3):
-            block_values = []
-            for row_idx in range(3):
-                block_values += [
-                    table[
-                        3 * row_block_idx + row_idx, 3 * col_block_idx + col_idx
-                    ].get_candidate_values()
-                    for col_idx in range(3)
-                ]
-            unique_values = appears_once(block_values)
-            for unique_value in unique_values:
-                changed = True
-                idx = [unique_value in k for k in block_values].index(True)
-                table.set_value(idx // 3, idx % 3, unique_value)
-    return changed
+    for unit in range(9):
+        if unit_type == "row":
+            values = [table[unit, col].get_candidate_values() for col in range(9)]
+        elif unit_type == "column":
+            values = [table[row, unit].get_candidate_values() for row in range(9)]
+        elif unit_type == "block":
+            block_row = unit // 3
+            block_col = unit % 3
+            values = [
+                table[3 * block_row + row, 3 * block_col + col].get_candidate_values()
+                for row in range(3)
+                for col in range(3)
+            ]
+        else:
+            raise ValueError("unit_type must be 'row', 'column', or 'block'.")
 
-
-def fill_unique_value_column(table):
-    changed = False
-    for col in range(9):
-        col_values = [
-            table[row_idx, col].get_candidate_values() for row_idx in range(9)
-        ]
-        unique_values = appears_once(col_values)
+        unique_values = appears_once(values)
         for unique_value in unique_values:
             changed = True
-            row_idx = [unique_value in k for k in col_values].index(True)
-            table.set_value(row_idx, col, unique_value)
-    return changed
-
-
-def fill_unique_value_row(table):
-    changed = False
-    for row in range(9):
-        rows_values = [
-            table[row, col_idx].get_candidate_values() for col_idx in range(9)
-        ]
-        unique_values = appears_once(rows_values)
-        for unique_value in unique_values:
-            changed = True
-            col_idx = [unique_value in k for k in rows_values].index(True)
-            table.set_value(row, col_idx, unique_value)
+            idx = [unique_value in k for k in values].index(True)
+            if unit_type == "row":
+                row, col = unit, idx
+            elif unit_type == "column":
+                row, col = idx, unit
+            elif unit_type == "block":
+                row = 3 * block_row + (idx // 3)
+                col = 3 * block_col + (idx % 3)
+            table.set_value(row, col, unique_value)
     return changed
 
 
