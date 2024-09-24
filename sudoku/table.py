@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sudoku.cell import Cell
 
@@ -39,10 +40,13 @@ class Table:
                                 candidate_values.discard(other_cell.value)
                     cell.candidate_values = candidate_values
 
-    def load_from_csv(self, path_to_csv, delimiter=";"):
-        df = pd.read_csv(path_to_csv, delimiter=delimiter, header=None)
-        df = df.fillna(self.none_value)
-        original_data = df.to_numpy().astype(int)
+    def load_from_data(self, data, delimiter=";"):
+        if isinstance(data, str):
+            df = pd.read_csv(data, delimiter=delimiter, header=None)
+            df = df.fillna(self.none_value)
+            original_data = df.to_numpy().astype(int)
+        elif isinstance(data, np.ndarray):
+            original_data = data.astype(int)
         # Now convert to a Table of Cells
         data = []
         for row_idx, row in enumerate(original_data):
